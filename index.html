@@ -775,65 +775,69 @@
             else if (dir === 'DOWN' && direction !== 'UP') direction = 'DOWN';
         }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#9BBC0F';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        let score = 0; // Initialize score to 0
 
-            for (let i = 0; i < snake.length; i++) {
-                ctx.fillStyle = i === 0 ? '#0F380F' : '#306230';
-                ctx.fillRect(snake[i].x, snake[i].y, box, box);
-                ctx.strokeStyle = '#8BAC0F';
-                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
-            }
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#9BBC0F';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#8BAC0F';
-            ctx.fillRect(food.x, food.y, box, box);
+    for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i === 0 ? '#0F380F' : '#306230';
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+        ctx.strokeStyle = '#8BAC0F';
+        ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+    }
 
-            let snakeX = snake[0].x;
-            let snakeY = snake[0].y;
+    ctx.fillStyle = '#8BAC0F';
+    ctx.fillRect(food.x, food.y, box, box);
 
-            if (direction === 'LEFT') snakeX -= box;
-            if (direction === 'UP') snakeY -= box;
-            if (direction === 'RIGHT') snakeX += box;
-            if (direction === 'DOWN') snakeY += box;
+    let snakeX = snake[0].x;
+    let snakeY = snake[0].y;
 
-            // Game over conditions
-            if (
-                snakeX < 0 ||
-                snakeX >= canvas.width ||
-                snakeY < 0 ||
-                snakeY >= canvas.height ||
-                collision({ x: snakeX, y: snakeY }, snake)
-            ) {
-                clearInterval(game);
-                alert('Game Over');
-                resetGame();
-                return;
-            }
+    if (direction === 'LEFT') snakeX -= box;
+    if (direction === 'UP') snakeY -= box;
+    if (direction === 'RIGHT') snakeX += box;
+    if (direction === 'DOWN') snakeY += box;
 
-            if (snakeX === food.x && snakeY === food.y) {
-                food = generateFood();
-                // The snake grows; do not remove the tail
-            } else {
-                snake.pop(); // Remove the tail
-            }
+    // Game over conditions
+    if (
+        snakeX < 0 ||
+        snakeX >= canvas.width ||
+        snakeY < 0 ||
+        snakeY >= canvas.height ||
+        collision({ x: snakeX, y: snakeY }, snake)
+    ) {
+        clearInterval(game);
+        alert('Game Over');
+        resetGame();
+        return;
+    }
 
-            let newHead = {
-                x: snakeX,
-                y: snakeY
-            };
+    if (snakeX === food.x && snakeY === food.y) {
+        food = generateFood();
+        score++; // Increase the score when the snake eats the food
 
-            snake.unshift(newHead);
-
-            // Check win condition (snake fills the grid)
-            if (snake.length === GRID_SIZE * GRID_SIZE) {
-                clearInterval(game);
-                alert('You Win!');
-                revealGift();
-            }
+        // Check if the score reaches 5 points
+        if (score === 5) {
+            clearInterval(game);
+            alert('You Win!');
+            revealGift(); // Reveal the gift when the player wins
+            return;
         }
 
+        // The snake grows; do not remove the tail
+    } else {
+        snake.pop(); // Remove the tail
+    }
+
+    let newHead = {
+        x: snakeX,
+        y: snakeY
+    };
+
+    snake.unshift(newHead);
+}
         function collision(head, array) {
             for (let i = 1; i < array.length; i++) {
                 if (head.x === array[i].x && head.y === array[i].y) {
